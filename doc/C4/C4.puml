@@ -1,6 +1,16 @@
 @startuml Bonuses
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 
+
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/main/icons/devicons2
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/main/icons/font-awesome-5
+!include DEVICONS/apachekafka_original.puml
+
+AddElementTag("ToDo", $fontColor="orange")
+AddElementTag("Kafka", $fontColor="GreenYellow")
+
+AddRelTag("ToDo", $textColor="red", $lineColor="orange", $lineStyle = DashedLine())
+
 Person(Spec1, "Специалист процессинга 1")
 System_Ext(Bitrix, "Битрикс") {
     Container(web_app_bitrix, "Расчет премии", "Подсистема по расчету премии сотрудников")
@@ -13,7 +23,7 @@ System_Ext(HRBS, "HR bonus system") {
 
 Person(Kadrovik, "Кадровик")
 System_Boundary(HRM, "1С: ЗУП") {
-    Container(web_app_hrm, "Подготовка премии сотрудников", "Подсистема по подготовке премии сотрудников")
+    Container(web_app_hrm, "Подготовка премии сотрудников", "Подсистема по подготовке премии сотрудников", $tags="ToDo")
     Container(web_app_hrm1, "Премия", "Подсистема по начислению премии сотрудникам")
 }
 
@@ -24,30 +34,32 @@ System_Ext(DOCU, "Documentolog") {
 
 Person(Buhgalter, "Бухгалтер")
 
-System_Ext("Kafka", "Kafka")
+System_Ext("Kafka", "Kafka", $tags="Kafka", $sprite="apachekafka_original")
 
-' Связи
+' Связи 
 
 Rel(Spec1, web_app_bitrix, "", "Готовит расчеты")
 
 Rel(Spec2, web_app_hr_bonus, "", "Готовит расчеты")
 
-Rel(Kadrovik, web_app_hrm, "", "Выполняет подготовку")
+Rel(Kadrovik, web_app_hrm, "", "Выполняет подготовку", $tags="ToDo")
 Rel(Buhgalter, web_app_hrm1, "", "Создает премию")
 
 Rel(Rukovoditel, web_app_docu, "", "Согласование")
 Rel(Buhgalter, web_app_docu, "", "Получает готовый файл")
 
-Rel(Bitrix, web_app_hrm, "", "Загрузка через API")
-Rel(HRBS, web_app_hrm, "", "Загрузка через Excel")
+Rel(Bitrix, web_app_hrm, "", "Загрузка через API", $tags="ToDo")
+Rel(HRBS, web_app_hrm, "", "Загрузка через Excel", $tags="ToDo")
 
 Rel(DOCU, Kafka, "", "Статус подписания")
-Rel(web_app_hrm, Kafka, "", "Отправка вложений и получение статуса")
+Rel(web_app_hrm, Kafka, "", "Отправка вложений и получение статуса", $tags="ToDo")
 
 ' Расположение
 
 Lay_U(Spec2, Spec1)
 Lay_U(DOCU, HRM)
 Lay_U(HRM, Kafka)
+
+SHOW_LEGEND()
 
 @enduml
