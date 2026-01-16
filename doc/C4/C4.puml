@@ -1,0 +1,53 @@
+@startuml Bonuses
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(Spec1, "Специалист процессинга 1")
+System_Ext(Bitrix, "Битрикс") {
+    Container(web_app_bitrix, "Расчет премии", "Подсистема по расчету премии сотрудников")
+}
+
+Person(Spec2, "Специалист процессинга 2")
+System_Ext(HRBS, "HR bonus system") {
+    Container(web_app_hr_bonus, "Расчет бонусов сотрудников", "Система по расчету бонусов сотрудников по отработкам")
+}
+
+Person(Kadrovik, "Кадровик")
+System_Boundary(HRM, "1С: ЗУП") {
+    Container(web_app_hrm, "Подготовка премии сотрудников", "Подсистема по подготовке премии сотрудников")
+    Container(web_app_hrm1, "Премия", "Подсистема по начислению премии сотрудникам")
+}
+
+Person(Rukovoditel, "Руководитель")
+System_Ext(DOCU, "Documentolog") {
+    Container(web_app_docu, "Модуль подписания", "Модуль согласования и подписания документов с ЭЦП")
+}
+
+Person(Buhgalter, "Бухгалтер")
+
+System_Ext("Kafka", "Kafka")
+
+' Связи
+
+Rel(Spec1, web_app_bitrix, "", "Готовит расчеты")
+
+Rel(Spec2, web_app_hr_bonus, "", "Готовит расчеты")
+
+Rel(Kadrovik, web_app_hrm, "", "Выполняет подготовку")
+Rel(Buhgalter, web_app_hrm1, "", "Создает премию")
+
+Rel(Rukovoditel, web_app_docu, "", "Согласование")
+Rel(Buhgalter, web_app_docu, "", "Получает готовый файл")
+
+Rel(Bitrix, web_app_hrm, "", "Загрузка через API")
+Rel(HRBS, web_app_hrm, "", "Загрузка через Excel")
+
+Rel(DOCU, Kafka, "", "Статус подписания")
+Rel(web_app_hrm, Kafka, "", "Отправка вложений и получение статуса")
+
+' Расположение
+
+Lay_U(Spec2, Spec1)
+Lay_U(DOCU, HRM)
+Lay_U(HRM, Kafka)
+
+@enduml
